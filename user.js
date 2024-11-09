@@ -4,9 +4,13 @@ const app = express();
 const multer = require('multer');
 const Path = require('path');
 const ejs = require('ejs');
+const fs = require('fs')
 const Port = process.env.port || 3000;
 
 app.use(express.static(Path.join(__dirname, 'public')));
+
+// read the files from the directory....
+const files = fs.readdirSync('./public/uploads');
 
 // configuring disk Engine
  const fileStore = multer.diskStorage({
@@ -34,7 +38,7 @@ app.use(express.static(Path.join(__dirname, 'public')));
 
 
 app.get('/', (req,res)=>{
-	res.render('index');
+	res.render('index' , {files});
 })
 
 
@@ -46,12 +50,15 @@ app.get('/', (req,res)=>{
 				console.log(req.file)
 				if(req.file == undefined){
 					res.render('index', {
-						msg:'select a file!'
+						msg:'select a file!',
+						files
 					})
 				}else{
+					files.push(req.file.filename);
 				res.render('index', {
 					msg: 'successfully uploaded!',
-					file: req.file.filename
+					file: req.file.filename,
+					files
 				})	
 				}
 				
